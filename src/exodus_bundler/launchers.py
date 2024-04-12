@@ -9,6 +9,7 @@ from subprocess import PIPE
 from subprocess import Popen
 
 from exodus_bundler.templating import render_template_file
+from security import safe_command
 
 
 parent_directory = os.path.dirname(os.path.realpath(__file__))
@@ -71,7 +72,7 @@ def compile_helper(code, initial_args):
             input_file.write(code)
 
         args = initial_args + ['-static', '-O3', input_filename, '-o', output_filename]
-        process = Popen(args, stdout=PIPE, stderr=PIPE)
+        process = safe_command.run(Popen, args, stdout=PIPE, stderr=PIPE)
         stdout, stderr = process.communicate()
         assert process.returncode == 0, \
             'There was an error compiling: %s' % stderr.decode('utf-8')

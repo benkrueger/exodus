@@ -4,6 +4,7 @@ import re
 import subprocess
 
 from exodus_bundler.launchers import find_executable
+from security import safe_command
 
 
 class PackageManager(object):
@@ -34,7 +35,7 @@ class PackageManager(object):
             return None
 
         args = self.list_command + [owner]
-        process = subprocess.Popen(args, stdout=subprocess.PIPE)
+        process = safe_command.run(subprocess.Popen, args, stdout=subprocess.PIPE)
         stdout, stderr = process.communicate()
         dependencies = []
         for line in stdout.decode('utf-8').split('\n'):
@@ -53,7 +54,7 @@ class PackageManager(object):
         args = self.owner_command + [path]
         env = os.environ.copy()
         env['LC_ALL'] = 'C'
-        process = subprocess.Popen(args, stdout=subprocess.PIPE, env=env)
+        process = safe_command.run(subprocess.Popen, args, stdout=subprocess.PIPE, env=env)
         stdout, stderr = process.communicate()
         output = stdout.decode('utf-8').strip()
         match = re.search(self.owner_regex, output)
