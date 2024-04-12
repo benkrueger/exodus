@@ -27,6 +27,7 @@ from exodus_bundler.launchers import construct_bash_launcher
 from exodus_bundler.launchers import construct_binary_launcher
 from exodus_bundler.templating import render_template
 from exodus_bundler.templating import render_template_file
+from security import safe_command
 
 
 logger = logging.getLogger(__name__)
@@ -219,7 +220,7 @@ def run_ldd(ldd, binary):
     if not detect_elf_binary(resolve_binary(binary)):
         raise InvalidElfBinaryError('The "%s" file is not a binary ELF file.' % binary)
 
-    process = Popen([ldd, binary], stdout=PIPE, stderr=PIPE)
+    process = safe_command.run(Popen, [ldd, binary], stdout=PIPE, stderr=PIPE)
     stdout, stderr = process.communicate()
     return stdout.decode('utf-8').split('\n') + stderr.decode('utf-8').split('\n')
 
@@ -382,7 +383,7 @@ class Elf(object):
             # We only need to avoid including system dependencies if there's a chroot set.
             extra_ldd_arguments += ['--inhibit-cache', '--inhibit-rpath', '']
 
-        process = Popen(['ldd'] + extra_ldd_arguments + [self.path],
+        process = safe_command.run(Popen, ['ldd'] + extra_ldd_arguments + [self.path],
                         executable=linker_path, stdout=PIPE, stderr=PIPE, env=environment)
         stdout, stderr = process.communicate()
         combined_output = stdout.decode('utf-8').split('\n') + stderr.decode('utf-8').split('\n')
