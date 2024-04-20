@@ -42,9 +42,12 @@ def bytes_to_int(bytes, byteorder='big'):
     return sum(int(char) * 256 ** i for (i, char) in enumerate(chars))
 
 
-def create_bundle(executables, output, tarball=False, rename=[], chroot=None, add=[],
-                  no_symlink=[], shell_launchers=False, detect=False):
+def create_bundle(executables, output, tarball=False, rename=None, chroot=None, add=None,
+                  no_symlink=None, shell_launchers=False, detect=False):
     """Handles the creation of the full bundle."""
+    rename = [] if rename is None else rename
+    add = [] if add is None else add
+    no_symlink = [] if no_symlink is None else no_symlink
     # Initialize these ahead of time so they're always available for error handling.
     output_filename, output_file, root_directory = None, None, None
     try:
@@ -101,9 +104,12 @@ def create_bundle(executables, output, tarball=False, rename=[], chroot=None, ad
                 os.chmod(output_filename, st.st_mode | stat.S_IEXEC)
 
 
-def create_unpackaged_bundle(executables, rename=[], chroot=None, add=[], no_symlink=[],
+def create_unpackaged_bundle(executables, rename=None, chroot=None, add=None, no_symlink=None,
                              shell_launchers=False, detect=False):
     """Creates a temporary directory containing the unpackaged contents of the bundle."""
+    rename = [] if rename is None else rename
+    add = [] if add is None else add
+    no_symlink = [] if no_symlink is None else no_symlink
     bundle = Bundle(chroot=chroot, working_directory=True)
     try:
         # Sanitize the inputs.
