@@ -87,7 +87,7 @@ def create_bundle(executables, output, tarball=False, rename=[], chroot=None, ad
             output_file.write(tar_stream.getvalue())
 
         # Write out the success message.
-        logger.info('Successfully created "%s".' % output_filename)
+        logger.info('Successfully created "%s".', output_filename)
         return True
     except:  # noqa: E722
         raise
